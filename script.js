@@ -92,6 +92,8 @@ const questions = [
 
 let currentQuestion = 0;
 
+let answered= false;
+
 function showQuestion() {
   const q = questions[currentQuestion];
   document.getElementById("question").innerText = q.question;
@@ -104,6 +106,8 @@ function showQuestion() {
     answersDiv.appendChild(btn);
   });
   document.getElementById("result").innerText = "";
+answered =false;
+
 }
 
 function checkAnswer(i) {
@@ -116,6 +120,7 @@ function checkAnswer(i) {
     result.innerText = "טעות!";
     result.style.color = "red";
   }
+answered =true;
 }
 
 function nextQuestion() {
@@ -126,6 +131,11 @@ function nextQuestion() {
     document.getElementById("question").innerText = "סיימת את הטריוויה!";
     document.getElementById("answers").innerHTML = "";
     document.getElementById("result").innerText = "";
+  }
+   if (!answered) {
+    document.getElementById("result").innerText = "קודם תענה על השאלה!";
+    document.getElementById("result").style.color = "orange";
+    return; 
   }
 }
 
