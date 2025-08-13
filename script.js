@@ -124,6 +124,11 @@ answered =true;
 }
 
 function nextQuestion() {
+if (!answered) {
+    document.getElementById("result").innerText = "קודם תענה על השאלה!";
+    document.getElementById("result").style.color = "orange";
+    return; 
+  }
   currentQuestion++;
   if (currentQuestion < questions.length) {
     showQuestion();
@@ -132,11 +137,8 @@ function nextQuestion() {
     document.getElementById("answers").innerHTML = "";
     document.getElementById("result").innerText = "";
   }
-   if (!answered) {
-    document.getElementById("result").innerText = "קודם תענה על השאלה!";
-    document.getElementById("result").style.color = "orange";
-    return; 
+   
   }
-}
+
 
 showQuestion();
