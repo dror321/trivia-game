@@ -127,6 +127,8 @@ function checkAnswer(i) {
   } else {
     result.innerText = "טעות!";
     result.style.color = "red";
+    setTimeout= 1
+    nextQuestion()
   }
 answered =true;
 }
