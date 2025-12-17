@@ -320,6 +320,9 @@ function checkAnswer(i) {
   if (i === q.correct) {
     result.innerText = "נכון!";
     result.style.color = "green";
+     setTimeout(() => {
+        nextQuestion();
+    }, 1000);
   } else {
     result.innerText = "טעות!";
     result.style.color = "red";
