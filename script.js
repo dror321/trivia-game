@@ -320,22 +320,18 @@ function startTimer(duration = 5000) {
   bar.style.width = "0%";
 
   timer = setTimeout(() => {
-    if (isPaused) return;
+     const result = document.getElementById("result");
+  result.innerText = "⏰ הזמן נגמר!";
+  result.style.color = "orange";
 
-    const result = document.getElementById("result");
-    result.innerText = "⏰ הזמן נגמר!";
-    result.style.color = "orange";
+  const buttons = document.querySelectorAll("#answers button");
+  buttons.forEach(btn => btn.disabled = true);
 
-    const buttons = document.querySelectorAll("#answers button");
-    buttons.forEach(btn => btn.disabled = true);
-
-    setTimeout(() => {
-      nextQuestion();
-    }, 1000);
-
-  }, duration);
+  setTimeout(() => {
+    nextQuestion();
+  }, 1000);
+}, duration);
 }
-
 
 function showQuestion() {
   const q = questions[currentQuestion];
