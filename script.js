@@ -288,6 +288,12 @@ const questions = [
 
 let currentQuestion = 0;
 
+let timer;
+
+let isPaused = false;
+let timeRemaining = 5000;
+let startTime;
+
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -296,6 +302,40 @@ function shuffleArray(array) {
   }
 }
 shuffleArray(questions); 
+
+function startTimer(duration = 5000) {
+  if (isPaused) return;
+
+  const bar = document.getElementById("timer-bar");
+
+  timeRemaining = duration;
+  startTime = Date.now();
+
+  bar.style.transition = "none";
+  bar.style.width = "100%";
+
+  void bar.offsetWidth;
+
+  bar.style.transition = `width ${duration}ms linear`;
+  bar.style.width = "0%";
+
+  timer = setTimeout(() => {
+    if (isPaused) return;
+
+    const result = document.getElementById("result");
+    result.innerText = "⏰ הזמן נגמר!";
+    result.style.color = "orange";
+
+    const buttons = document.querySelectorAll("#answers button");
+    buttons.forEach(btn => btn.disabled = true);
+
+    setTimeout(() => {
+      nextQuestion();
+    }, 1000);
+
+  }, duration);
+}
+
 
 function showQuestion() {
   const q = questions[currentQuestion];
@@ -309,10 +349,18 @@ function showQuestion() {
     answersDiv.appendChild(btn);
   });
   document.getElementById("result").innerText = "";
+  startTimer();
 
 }
 
 function checkAnswer(i) {
+  clearTimeout(timer);
+
+  const bar = document.getElementById("timer-bar");
+  const computedWidth = window.getComputedStyle(bar).width;
+  bar.style.transition = "none";
+  bar.style.width = computedWidth;
+
   const q = questions[currentQuestion];
   const result = document.getElementById("result");
 
@@ -339,6 +387,7 @@ function checkAnswer(i) {
 
 
 function nextQuestion() {
+  if (isPaused) return;
   currentQuestion++;
 
   if (currentQuestion < questions.length) {
@@ -351,5 +400,62 @@ function nextQuestion() {
    
   }
 
+
+
+function togglePause() {
+  const button = document.getElementById("pause-btn");
+  const bar = document.getElementById("timer-bar");
+
+  if (!isPaused) {
+    
+    isPaused = true;
+
+    clearTimeout(timer);
+
+    const elapsed = Date.now() - startTime;
+    timeRemaining -= elapsed;
+
+    const computedWidth = window.getComputedStyle(bar).width;
+    bar.style.transition = "none";
+    bar.style.width = computedWidth;
+
+    const buttons = document.querySelectorAll("#answers button");
+    buttons.forEach(btn => btn.disabled = true);
+
+    document.getElementById("result").innerText = "⏸ המשחק נעצר";
+    document.getElementById("result").style.color = "blue";
+
+    button.innerText = "▶ המשך";
+
+  } else {
+    
+    isPaused = false;
+
+    const percentLeft = (timeRemaining / 5000) * 100;
+
+    bar.style.transition = "none";
+    bar.style.width = percentLeft + "%";
+
+    void bar.offsetWidth;
+
+    bar.style.transition = `width ${timeRemaining}ms linear`;
+    bar.style.width = "0%";
+
+    startTime = Date.now();
+
+    timer = setTimeout(() => {
+      nextQuestion();
+    }, timeRemaining);
+
+    document.getElementById("result").innerText = "";
+
+    const buttons = document.querySelectorAll("#answers button");
+    buttons.forEach(btn => btn.disabled = false);
+
+    button.innerText = "⏸ עצור";
+  }
+}
+
+document.getElementById("pause-btn").addEventListener("click", togglePause);
 
 showQuestion();
