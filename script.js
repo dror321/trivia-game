@@ -317,30 +317,30 @@ answered =false;
 function checkAnswer(i) {
   const q = questions[currentQuestion];
   const result = document.getElementById("result");
+
+
+  const buttons = document.querySelectorAll("#answers button");
+  buttons.forEach(btn => btn.disabled = true);
+
+
   if (i === q.correct) {
     result.innerText = "נכון!";
     result.style.color = "green";
-     setTimeout(() => {
-        nextQuestion();
-    }, 1000);
   } else {
     result.innerText = "טעות!";
     result.style.color = "red";
+  }
+
     setTimeout(() => {
         nextQuestion();
     }, 1000);
 }
   
-answered =true;
-}
+
 
 function nextQuestion() {
-if (!answered) {
-    document.getElementById("result").innerText = "קודם תענה על השאלה!";
-    document.getElementById("result").style.color = "orange";
-    return; 
-  }
   currentQuestion++;
+  
   if (currentQuestion < questions.length) {
     showQuestion();
   } else {
