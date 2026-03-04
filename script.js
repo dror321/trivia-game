@@ -288,7 +288,6 @@ const questions = [
 
 let currentQuestion = 0;
 
-let answered= false;
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -310,7 +309,6 @@ function showQuestion() {
     answersDiv.appendChild(btn);
   });
   document.getElementById("result").innerText = "";
-answered =false;
 
 }
 
@@ -329,6 +327,8 @@ function checkAnswer(i) {
   } else {
     result.innerText = "טעות!";
     result.style.color = "red";
+
+     buttons[q.correct].style.backgroundColor = "green";
   }
 
     setTimeout(() => {
@@ -340,7 +340,7 @@ function checkAnswer(i) {
 
 function nextQuestion() {
   currentQuestion++;
-  
+
   if (currentQuestion < questions.length) {
     showQuestion();
   } else {
