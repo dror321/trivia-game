@@ -328,7 +328,7 @@ function checkAnswer(i) {
     result.innerText = "טעות!";
     result.style.color = "red";
 
-     buttons[q.correct].style.backgroundColor = "green";
+     buttons[q.correct].style.backgroundColor = "#47a847";
   }
 
     setTimeout(() => {
