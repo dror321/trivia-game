@@ -247,44 +247,44 @@ const questions = [
   answers: ["רוסיה", "טורקיה", "קזחסטן", "כל התשובות נכונות"],
   correct: 3
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const QUESTION_TIME = 10000;
 
 let currentQuestion = 0;
 
@@ -292,23 +292,27 @@ let timer;
 
 let isPaused = false;
 
-let timeRemaining = 5000;
+let timeRemaining = QUESTION_TIME;
 let startTime;
 
 let colorInterval;
 
-function startTimer(duration = 10000) {
+function startTimer(duration = QUESTION_TIME) {
   if (isPaused) return;
 
   const bar = document.getElementById("timer-bar");
 
+  bar.style.backgroundColor = "hsl(120, 100%, 45%)";
+
+  clearInterval(colorInterval);
+
   timeRemaining = duration;
   startTime = Date.now();
-  
+
   colorInterval = setInterval(() => {
 
     const elapsed = Date.now() - startTime;
-    const percent = elapsed / duration;
+    const percent = (QUESTION_TIME - timeRemaining + elapsed) / QUESTION_TIME;
 
     if (percent > 1) {
       clearInterval(colorInterval);
@@ -329,6 +333,7 @@ function startTimer(duration = 10000) {
   bar.style.width = "0%";
 
   timer = setTimeout(() => {
+
     const result = document.getElementById("result");
     result.innerText = "⏰ הזמן נגמר!";
     result.style.color = "orange";
@@ -344,25 +349,34 @@ function startTimer(duration = 10000) {
 }
 
 function showQuestion() {
+
   const q = questions[currentQuestion];
+
   document.getElementById("question").innerText = q.question;
+
   const answersDiv = document.getElementById("answers");
   answersDiv.innerHTML = "";
+
   q.answers.forEach((ans, i) => {
     const btn = document.createElement("button");
     btn.innerText = ans;
     btn.onclick = () => checkAnswer(i);
     answersDiv.appendChild(btn);
   });
+
   document.getElementById("result").innerText = "";
+
   startTimer();
 
 }
 
 function checkAnswer(i) {
+
   clearTimeout(timer);
+  clearInterval(colorInterval);
 
   const bar = document.getElementById("timer-bar");
+
   const computedWidth = window.getComputedStyle(bar).width;
   bar.style.transition = "none";
   bar.style.width = computedWidth;
@@ -382,38 +396,40 @@ function checkAnswer(i) {
     result.innerText = "טעות!";
     result.style.color = "red";
 
-     buttons[q.correct].style.backgroundColor = "#47a847";
+    buttons[q.correct].style.backgroundColor = "#47a847";
   }
 
-    setTimeout(() => {
-        nextQuestion();
-    }, 1000);
+  setTimeout(() => {
+    nextQuestion();
+  }, 1000);
 }
-  
+
 
 
 function nextQuestion() {
+
   if (isPaused) return;
+
   currentQuestion++;
 
   if (currentQuestion < questions.length) {
     showQuestion();
   } else {
+
     document.getElementById("question").innerText = "סיימת את הטריוויה!";
     document.getElementById("answers").innerHTML = "";
     document.getElementById("result").innerText = "";
-  }
-   
-  }
 
-
+  }
+}
 
 function togglePause() {
+
   const button = document.getElementById("pause-btn");
   const bar = document.getElementById("timer-bar");
 
   if (!isPaused) {
-    
+
     isPaused = true;
 
     clearTimeout(timer);
@@ -423,6 +439,7 @@ function togglePause() {
     timeRemaining -= elapsed;
 
     const computedWidth = window.getComputedStyle(bar).width;
+
     bar.style.transition = "none";
     bar.style.width = computedWidth;
 
@@ -434,40 +451,59 @@ function togglePause() {
 
     button.innerText = "▶ המשך";
 
- } else {
+  } else {
 
-  isPaused = false;
+    isPaused = false;
 
-  const bar = document.getElementById("timer-bar");
+    const percentLeft = (timeRemaining / QUESTION_TIME) * 100;
 
-  const percentLeft = (timeRemaining / 10000) * 100;
+    bar.style.transition = "none";
+    bar.style.width = percentLeft + "%";
 
-  bar.style.transition = "none";
-  bar.style.width = percentLeft + "%";
+    void bar.offsetWidth;
 
-  void bar.offsetWidth;
+    bar.style.transition = `width ${timeRemaining}ms linear`;
+    bar.style.width = "0%";
 
-  bar.style.transition = `width ${timeRemaining}ms linear`;
-  bar.style.width = "0%";
+    startTime = Date.now();
 
-  startTime = Date.now();
+    colorInterval = setInterval(() => {
 
-  timer = setTimeout(() => {
-    const result = document.getElementById("result");
-    result.innerText = "⏰ הזמן נגמר!";
-    result.style.color = "orange";
+      const elapsed = Date.now() - startTime;
+      const percent = (QUESTION_TIME - timeRemaining + elapsed) / QUESTION_TIME;
+
+      if (percent > 1) {
+        clearInterval(colorInterval);
+        return;
+      }
+
+      const hue = 120 - (120 * percent);
+      bar.style.backgroundColor = `hsl(${hue}, 100%, 45%)`;
+
+    }, 50);
+
+    timer = setTimeout(() => {
+
+      const result = document.getElementById("result");
+      result.innerText = "⏰ הזמן נגמר!";
+      result.style.color = "orange";
+
+      const buttons = document.querySelectorAll("#answers button");
+      buttons.forEach(btn => btn.disabled = true);
+
+      setTimeout(() => {
+        nextQuestion();
+      }, 1000);
+
+    }, timeRemaining);
 
     const buttons = document.querySelectorAll("#answers button");
-    buttons.forEach(btn => btn.disabled = true);
+    buttons.forEach(btn => btn.disabled = false);
 
-    setTimeout(() => {
-      nextQuestion();
-    }, 1000);
+    document.getElementById("result").innerText = "";
 
-  }, timeRemaining);
-
-  button.innerText = "⏸ עצור";
- }
+    button.innerText = "⏸ עצור";
+  }
 }
 
 document.getElementById("pause-btn").addEventListener("click", togglePause);
