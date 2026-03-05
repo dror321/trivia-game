@@ -291,25 +291,34 @@ let currentQuestion = 0;
 let timer;
 
 let isPaused = false;
+
 let timeRemaining = 5000;
 let startTime;
 
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+let colorInterval;
 
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-shuffleArray(questions); 
-
-function startTimer(duration = 5000) {
+function startTimer(duration = 10000) {
   if (isPaused) return;
 
   const bar = document.getElementById("timer-bar");
 
   timeRemaining = duration;
   startTime = Date.now();
+  
+  colorInterval = setInterval(() => {
+
+    const elapsed = Date.now() - startTime;
+    const percent = elapsed / duration;
+
+    if (percent > 1) {
+      clearInterval(colorInterval);
+      return;
+    }
+
+    const hue = 120 - (120 * percent);
+    bar.style.backgroundColor = `hsl(${hue}, 100%, 45%)`;
+
+  }, 50);
 
   bar.style.transition = "none";
   bar.style.width = "100%";
@@ -320,17 +329,18 @@ function startTimer(duration = 5000) {
   bar.style.width = "0%";
 
   timer = setTimeout(() => {
-     const result = document.getElementById("result");
-  result.innerText = "⏰ הזמן נגמר!";
-  result.style.color = "orange";
+    const result = document.getElementById("result");
+    result.innerText = "⏰ הזמן נגמר!";
+    result.style.color = "orange";
 
-  const buttons = document.querySelectorAll("#answers button");
-  buttons.forEach(btn => btn.disabled = true);
+    const buttons = document.querySelectorAll("#answers button");
+    buttons.forEach(btn => btn.disabled = true);
 
-  setTimeout(() => {
-    nextQuestion();
-  }, 1000);
-}, duration);
+    setTimeout(() => {
+      nextQuestion();
+    }, 1000);
+
+  }, duration);
 }
 
 function showQuestion() {
@@ -407,6 +417,7 @@ function togglePause() {
     isPaused = true;
 
     clearTimeout(timer);
+    clearInterval(colorInterval);
 
     const elapsed = Date.now() - startTime;
     timeRemaining -= elapsed;
@@ -423,33 +434,40 @@ function togglePause() {
 
     button.innerText = "▶ המשך";
 
-  } else {
-    
-    isPaused = false;
+ } else {
 
-    const percentLeft = (timeRemaining / 5000) * 100;
+  isPaused = false;
 
-    bar.style.transition = "none";
-    bar.style.width = percentLeft + "%";
+  const bar = document.getElementById("timer-bar");
 
-    void bar.offsetWidth;
+  const percentLeft = (timeRemaining / 10000) * 100;
 
-    bar.style.transition = `width ${timeRemaining}ms linear`;
-    bar.style.width = "0%";
+  bar.style.transition = "none";
+  bar.style.width = percentLeft + "%";
 
-    startTime = Date.now();
+  void bar.offsetWidth;
 
-    timer = setTimeout(() => {
-      nextQuestion();
-    }, timeRemaining);
+  bar.style.transition = `width ${timeRemaining}ms linear`;
+  bar.style.width = "0%";
 
-    document.getElementById("result").innerText = "";
+  startTime = Date.now();
+
+  timer = setTimeout(() => {
+    const result = document.getElementById("result");
+    result.innerText = "⏰ הזמן נגמר!";
+    result.style.color = "orange";
 
     const buttons = document.querySelectorAll("#answers button");
-    buttons.forEach(btn => btn.disabled = false);
+    buttons.forEach(btn => btn.disabled = true);
 
-    button.innerText = "⏸ עצור";
-  }
+    setTimeout(() => {
+      nextQuestion();
+    }, 1000);
+
+  }, timeRemaining);
+
+  button.innerText = "⏸ עצור";
+ }
 }
 
 document.getElementById("pause-btn").addEventListener("click", togglePause);
